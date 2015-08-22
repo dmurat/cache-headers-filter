@@ -1,3 +1,5 @@
+import org.grails.plugins.cacheheadersfilter.PluginSetupHelper
+
 class CacheHeadersFilterGrailsPlugin {
   def version = "0.0.1.BUILD-SNAPSHOT"
   def grailsVersion = "2.0 > *"
@@ -19,5 +21,11 @@ responses.
   def scm = [ url: 'https://github.com/dmurat/cache-headers-filter' ]
 
   def doWithWebDescriptor = { webXml ->
+    PluginSetupHelper.updateWebXml(webXml, application)
+  }
+
+  def getWebXmlFilterOrder() {
+    Class filterManagerClass = getClass().getClassLoader().loadClass('grails.plugin.webxml.FilterManager')
+    [CacheHeadersFilter: filterManagerClass.URL_MAPPING_POSITION + 101]
   }
 }
