@@ -22,7 +22,7 @@ responses.
   def scm = [ url: 'https://github.com/dmurat/cache-headers-filter' ]
 
   def doWithWebDescriptor = { webXml ->
-    PluginSetupHelper.updateWebXml(webXml, application)
+    PluginSetupHelper.updateWebXml(webXml, application.config)
   }
 
   /**

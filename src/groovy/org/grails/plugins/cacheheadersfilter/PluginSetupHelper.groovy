@@ -1,12 +1,11 @@
 package org.grails.plugins.cacheheadersfilter
 
 import groovy.util.logging.Slf4j
-import org.codehaus.groovy.grails.commons.GrailsApplication
 
 @Slf4j("LOGGER")
 class PluginSetupHelper {
-  static void updateWebXml(webXml, GrailsApplication application) {
-    if (!isPluginEnabled(application.config)) {
+  static void updateWebXml(webXml, ConfigObject config) {
+    if (!isPluginEnabled(config)) {
       return
     }
 
@@ -22,7 +21,7 @@ class PluginSetupHelper {
     filter[filter.size() - 1] + {
       "filter-mapping" {
         "filter-name"("CacheHeadersFilter")
-        "url-pattern"(getFilterMappingUrlPattern(application.config))
+        "url-pattern"(getFilterMappingUrlPattern(config))
       }
     }
   }
