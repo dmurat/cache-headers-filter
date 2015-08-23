@@ -56,6 +56,8 @@ map consist of several keys:
 * `type` - optional parameter which defines type of matcher and, implicitly, the syntax to be used in `pathList` config. Allowed values are `ant` and `regex` (or just `re`). Default is `ant`.
 * `pathList` - list of paths on which caching headers will be applied.
 
+Note that ordering of `mappingList` elements is significant since first found match will be activated. Therefore, when creating `mappingList` configuration, start with most specific paths.
+
 ## Other config options
 * `grails.plugins.cacheHeadersFilter.enabled` - boolean to enable or disable plugin. Default value is `true`.
 * `grails.plugins.cacheHeadersFilter.filterMappingUrlPattern` - String for defining filter mapping url pattern for this filter. Default value is `/*`.
