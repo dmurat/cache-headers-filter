@@ -1,3 +1,4 @@
+import org.grails.plugins.cacheheadersfilter.CacheHeadersFilter
 import org.grails.plugins.cacheheadersfilter.PluginSetupHelper
 
 class CacheHeadersFilterGrailsPlugin {
@@ -24,7 +25,13 @@ responses.
     PluginSetupHelper.updateWebXml(webXml, application)
   }
 
-  def getWebXmlFilterOrder() {
+  /**
+   * Called by WebxmlGrailsPlugin's _Events.groovy script from eventWebXmlEnd handler.
+   *
+   * @return Map keyed by filter name (defined in web.xml) with order defined as integer.
+   */
+  @SuppressWarnings("GroovyUnusedDeclaration")
+  Map getWebXmlFilterOrder() {
     Class filterManagerClass = getClass().getClassLoader().loadClass('grails.plugin.webxml.FilterManager')
     [CacheHeadersFilter: filterManagerClass.URL_MAPPING_POSITION + 101]
   }
