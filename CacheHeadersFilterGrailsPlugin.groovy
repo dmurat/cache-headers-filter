@@ -1,4 +1,3 @@
-import org.grails.plugins.cacheheadersfilter.CacheHeadersFilter
 import org.grails.plugins.cacheheadersfilter.PluginSetupHelper
 
 class CacheHeadersFilterGrailsPlugin {
