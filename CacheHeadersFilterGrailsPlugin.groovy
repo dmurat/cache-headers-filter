@@ -1,9 +1,11 @@
+import org.grails.plugins.cacheheadersfilter.CacheHeadersFilter
 import org.grails.plugins.cacheheadersfilter.PluginSetupHelper
 
 class CacheHeadersFilterGrailsPlugin {
   def version = "0.0.1.BUILD-SNAPSHOT"
   def grailsVersion = "2.0 > *"
   def pluginExcludes = []
+  def loadAfter = ["cacheHeaders"]
 
   def title = "Cache Headers Filter Plugin"
   def author = "Damir Murat"
@@ -20,10 +22,6 @@ responses.
   def issueManagement = [ system: "github", url: "https://github.com/dmurat/cache-headers-filter/issues" ]
   def scm = [ url: 'https://github.com/dmurat/cache-headers-filter' ]
 
-  def doWithWebDescriptor = { webXml ->
-    PluginSetupHelper.updateWebXml(webXml, application.config)
-  }
-
   /**
    * Called by WebxmlGrailsPlugin's _Events.groovy script from eventWebXmlEnd handler.
    *
@@ -33,5 +31,18 @@ responses.
   Map getWebXmlFilterOrder() {
     Class filterManagerClass = getClass().getClassLoader().loadClass('grails.plugin.webxml.FilterManager')
     [CacheHeadersFilter: filterManagerClass.URL_MAPPING_POSITION + 101]
+  }
+
+  def doWithWebDescriptor = { webXml ->
+    PluginSetupHelper.updateWebXml(webXml, application.config)
+  }
+
+  def doWithSpring = {
+    if (PluginSetupHelper.isPluginEnabled(application.config)) {
+      cacheHeadersFilter(CacheHeadersFilter) {
+        matcherList = PluginSetupHelper.constructMatcherList(application.config)
+        cacheHeadersService = ref("cacheHeadersService")
+      }
+    }
   }
 }

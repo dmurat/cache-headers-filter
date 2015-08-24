@@ -65,14 +65,15 @@ class PluginSetupHelperSpecification extends Specification {
     then:
     // With XmlSlurper, after modifying nodes, we need to parse document again in order to find created or modified nodes.
     def webXmlNodeResult = new XmlSlurper().parseText(serializeWebXml(webXml))
+    //noinspection GroovyAssignabilityCheck
     def cacheHeadersFilterNode = webXmlNodeResult.filter[0]
+    //noinspection GroovyAssignabilityCheck
     def cacheHeadersFilterMappingNode = webXmlNodeResult."filter-mapping"[0]
 
-    cacheHeadersFilterNode."filter-name".text() == "CacheHeadersFilter"
-    cacheHeadersFilterNode."filter-class".text() == "org.grails.plugins.cacheheadersfilter.CacheHeadersFilter"
+    cacheHeadersFilterNode."filter-name".text() == "cacheHeadersFilter"
+    cacheHeadersFilterNode."filter-class".text() == "org.springframework.web.filter.DelegatingFilterProxy"
 
-    cacheHeadersFilterMappingNode."filter-name".text() == "CacheHeadersFilter"
-    cacheHeadersFilterMappingNode."url-pattern".text() == "/*"
+    cacheHeadersFilterMappingNode."filter-name".text() == "cacheHeadersFilter"
   }
 
   def "should not update web.xml when plugin is not enabled"() {
@@ -86,5 +87,39 @@ class PluginSetupHelperSpecification extends Specification {
     then:
     def webXmlResult = serializeWebXml(webXml)
     !webXmlResult.contains("CacheHeadersFilter")
+  }
+
+  def "should setup default filter mapping"() {
+    given:
+    ConfigObject configObject = new ConfigSlurper().parse("")
+    def webXml = new XmlSlurper().parseText(WEB_XML)
+
+    when:
+    PluginSetupHelper.updateWebXml(webXml, configObject)
+
+    then:
+    // With XmlSlurper, after modifying nodes, we need to parse document again in order to find created or modified nodes.
+    def webXmlNodeResult = new XmlSlurper().parseText(serializeWebXml(webXml))
+    //noinspection GroovyAssignabilityCheck
+    def cacheHeadersFilterMappingNode = webXmlNodeResult."filter-mapping"[0]
+
+    cacheHeadersFilterMappingNode."url-pattern".text() == "/*"
+  }
+
+  def "should setup configured filter mapping"() {
+    given:
+    ConfigObject configObject = new ConfigSlurper().parse("grails.plugins.cacheHeadersFilter.filterMappingUrlPattern = '/someMapping/*'")
+    def webXml = new XmlSlurper().parseText(WEB_XML)
+
+    when:
+    PluginSetupHelper.updateWebXml(webXml, configObject)
+
+    then:
+    // With XmlSlurper, after modifying nodes, we need to parse document again in order to find created or modified nodes.
+    def webXmlNodeResult = new XmlSlurper().parseText(serializeWebXml(webXml))
+    //noinspection GroovyAssignabilityCheck
+    def cacheHeadersFilterMappingNode = webXmlNodeResult."filter-mapping"[0]
+
+    cacheHeadersFilterMappingNode."url-pattern".text() == "/someMapping/*"
   }
 }
