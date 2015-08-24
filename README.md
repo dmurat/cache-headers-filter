@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/dmurat/cache-headers-filter.svg?branch=master)](https://travis-ci.org/dmurat/cache-headers-filter)
+
 # cache-headers-filter
 Grails plugin which brings in a servlet filter for setting HTTP cache headers on HTTP responses.
 
