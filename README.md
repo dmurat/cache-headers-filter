@@ -66,3 +66,6 @@ Note that ordering of `mappingList` elements is significant since first found ma
 To see log output of a plugin, turn on desired level of logging for a package `org.grails.plugins.cacheheadersfilter`:
 
     debug "org.grails.plugins.cacheheadersfilter"
+
+## Version note
+Although the plugin is currently at version 0.0.1, it is feature complete. It will go at version 1.0.0 after some passed time and production usage just to make sure there is no blockers present.
