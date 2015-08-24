@@ -2,7 +2,7 @@ import org.grails.plugins.cacheheadersfilter.CacheHeadersFilter
 import org.grails.plugins.cacheheadersfilter.PluginSetupHelper
 
 class CacheHeadersFilterGrailsPlugin {
-  def version = "0.0.1.BUILD-SNAPSHOT"
+  def version = "0.0.1"
   def grailsVersion = "2.0 > *"
   def pluginExcludes = []
   def loadAfter = ["cacheHeaders"]
