@@ -200,9 +200,9 @@ class PluginSetupHelperSpecification extends Specification {
                 cacheHeadersPreset: "noCache",
                 type: "ant",
                 pathList: [
-                    "/senchaWorkspace/build/production/grichdemoweb/grichdemoweb-classic-*.json",
-                    "/senchaWorkspace/build/production/grichdemoweb/grichdemoweb-modern-*.json",
-                    "/senchaWorkspace/build/production/grichdemoweb/bootstrap.js"
+                    "/senchaWorkspace/build/production/*/*-classic-*.json",
+                    "/senchaWorkspace/build/production/*/*-modern-*.json",
+                    "/senchaWorkspace/build/production/*/bootstrap.js"
                 ]
             ],
             [
@@ -230,9 +230,9 @@ class PluginSetupHelperSpecification extends Specification {
             [
                 type: "ant",
                 pathList: [
-                    "/senchaWorkspace/build/production/grichdemoweb/grichdemoweb-classic-*.json",
-                    "/senchaWorkspace/build/production/grichdemoweb/grichdemoweb-modern-*.json",
-                    "/senchaWorkspace/build/production/grichdemoweb/bootstrap.js"
+                    "/senchaWorkspace/build/production/*/*-classic-*.json",
+                    "/senchaWorkspace/build/production/*/*-modern-*.json",
+                    "/senchaWorkspace/build/production/*/bootstrap.js"
                 ]
             ]
         ]""")
