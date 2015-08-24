@@ -2,6 +2,9 @@ package org.grails.plugins.cacheheadersfilter
 
 import groovy.xml.StreamingMarkupBuilder
 import groovy.xml.XmlUtil
+import org.grails.plugins.cacheheadersfilter.matcher.AntCacheHeadersUrlMatcher
+import org.grails.plugins.cacheheadersfilter.matcher.CacheHeadersUrlMatcher
+import org.grails.plugins.cacheheadersfilter.matcher.RegexCacheHeadersUrlMatcher
 import spock.lang.Specification
 
 class PluginSetupHelperSpecification extends Specification {
@@ -89,7 +92,7 @@ class PluginSetupHelperSpecification extends Specification {
     !webXmlResult.contains("CacheHeadersFilter")
   }
 
-  def "should setup default filter mapping"() {
+  def "should setup web.xml with default filter mapping"() {
     given:
     ConfigObject configObject = new ConfigSlurper().parse("")
     def webXml = new XmlSlurper().parseText(WEB_XML)
@@ -106,7 +109,7 @@ class PluginSetupHelperSpecification extends Specification {
     cacheHeadersFilterMappingNode."url-pattern".text() == "/*"
   }
 
-  def "should setup configured filter mapping"() {
+  def "should setup web.xml with configured filter mapping"() {
     given:
     ConfigObject configObject = new ConfigSlurper().parse("grails.plugins.cacheHeadersFilter.filterMappingUrlPattern = '/someMapping/*'")
     def webXml = new XmlSlurper().parseText(WEB_XML)
@@ -121,5 +124,146 @@ class PluginSetupHelperSpecification extends Specification {
     def cacheHeadersFilterMappingNode = webXmlNodeResult."filter-mapping"[0]
 
     cacheHeadersFilterMappingNode."url-pattern".text() == "/someMapping/*"
+  }
+
+  def "should be enabled by default"() {
+    given:
+    ConfigObject configObject = new ConfigSlurper().parse("")
+
+    when:
+    Boolean isEnabled = PluginSetupHelper.isPluginEnabled(configObject)
+
+    then:
+    isEnabled
+  }
+
+  def "should be enabled when configured so"() {
+    given:
+    ConfigObject configObject = new ConfigSlurper().parse("grails.plugins.cacheHeadersFilter.enabled = true")
+
+    when:
+    Boolean isEnabled = PluginSetupHelper.isPluginEnabled(configObject)
+
+    then:
+    isEnabled
+  }
+
+  def "should be disabled when configured so"() {
+    given:
+    ConfigObject configObject = new ConfigSlurper().parse("grails.plugins.cacheHeadersFilter.enabled = false")
+
+    when:
+    Boolean isEnabled = PluginSetupHelper.isPluginEnabled(configObject)
+
+    then:
+    !isEnabled
+  }
+
+  def "should give universal filter mapping by default"() {
+    given:
+    ConfigObject configObject = new ConfigSlurper().parse("")
+
+    when:
+    String filterMapping = PluginSetupHelper.getFilterMappingUrlPattern(configObject)
+
+    then:
+    filterMapping == "/*"
+  }
+
+  def "should give configured filter mapping"() {
+    given:
+    ConfigObject configObject = new ConfigSlurper().parse("grails.plugins.cacheHeadersFilter.filterMappingUrlPattern = '/someMapping/*'")
+
+    when:
+    String filterMapping = PluginSetupHelper.getFilterMappingUrlPattern(configObject)
+
+    then:
+    filterMapping == "/someMapping/*"
+  }
+
+  def "should construct empty mather list by default"() {
+    given:
+    ConfigObject configObject = new ConfigSlurper().parse("")
+
+    when:
+    List<CacheHeadersUrlMatcher> matcherList = PluginSetupHelper.constructMatcherList(configObject)
+
+    then:
+    matcherList.isEmpty()
+  }
+
+  def "should construct expected matcher list for configuration"() {
+    given:
+    ConfigObject configObject = new ConfigSlurper().parse("""
+        grails.plugins.cacheHeadersFilter.mappingList = [
+            [
+                cacheHeadersPreset: "noCache",
+                type: "ant",
+                pathList: [
+                    "/senchaWorkspace/build/production/grichdemoweb/grichdemoweb-classic-*.json",
+                    "/senchaWorkspace/build/production/grichdemoweb/grichdemoweb-modern-*.json",
+                    "/senchaWorkspace/build/production/grichdemoweb/bootstrap.js"
+                ]
+            ],
+            [
+                cacheHeadersPreset: "cache6Months",
+                type: "re",
+                pathList: [
+                    "^/senchaWorkspace/.*"
+                ]
+            ]
+        ]""")
+
+    when:
+    List<CacheHeadersUrlMatcher> matcherList = PluginSetupHelper.constructMatcherList(configObject)
+
+    then:
+    matcherList.size() == 4
+    matcherList.findAll({it instanceof AntCacheHeadersUrlMatcher }).size() == 3
+    matcherList.find { it instanceof RegexCacheHeadersUrlMatcher }
+  }
+
+  def "should not construct matcher when cacheHeadersPreset is missing in configuration"() {
+    given:
+    ConfigObject configObject = new ConfigSlurper().parse("""
+        grails.plugins.cacheHeadersFilter.mappingList = [
+            [
+                type: "ant",
+                pathList: [
+                    "/senchaWorkspace/build/production/grichdemoweb/grichdemoweb-classic-*.json",
+                    "/senchaWorkspace/build/production/grichdemoweb/grichdemoweb-modern-*.json",
+                    "/senchaWorkspace/build/production/grichdemoweb/bootstrap.js"
+                ]
+            ]
+        ]""")
+
+    when:
+    List<CacheHeadersUrlMatcher> matcherList = PluginSetupHelper.constructMatcherList(configObject)
+
+    then:
+    matcherList.size() == 0
+  }
+
+  def "should not construct matcher when pathList is missing in configuration"() {
+    given:
+    ConfigObject configObject = new ConfigSlurper().parse("""
+        grails.plugins.cacheHeadersFilter.mappingList = [
+            [
+                cacheHeadersPreset: "noCache",
+                type: "ant",
+                pathList: [
+                ]
+            ],
+            [
+                cacheHeadersPreset: "noCache",
+                type: "ant",
+            ],
+        ]""")
+
+    when:
+    List<CacheHeadersUrlMatcher> matcherList = PluginSetupHelper.constructMatcherList(configObject)
+
+    then:
+    matcherList.size() == 0
   }
 }
